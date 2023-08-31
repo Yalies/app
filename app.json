@@ -15,7 +15,37 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "yaliesApp",
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            },
+            "secure.its.yale.edu": {
+              "NSIncludesSubdomains": true,
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSExceptionRequiresForwardSecrecy": false
+            },
+            "yalies.io": {
+              "NSIncludesSubdomains": true,
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        },
+        "UIAppFonts": [
+          "fonts/FontAwesome.ttf",
+          "fonts/Ionicons.ttf",
+          "fonts/Foundation.ttf",
+          "fonts/MaterialCommunityIcons.ttf",
+          "fonts/MaterialIcons.ttf"
+        ]
+      },
+      "bundleIdentifier": "com.goldin.yalies"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +55,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "add21321-9e0c-4a76-8211-afc0b9aabfe5"
+      }
     }
   }
 }
