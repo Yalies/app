@@ -12,22 +12,21 @@ import { WebView } from "react-native-webview";
 import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import axios from 'axios';
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Tab = {
 	url: string;
-	icon:
-		| "home-outline"
-		| "information-circle-outline"
-		| "help-circle-outline"
-		| "exit-outline";
+	icon: "home" | "information-circle" | "help-circle" | "exit";
 };
 
-const HOST = "https://yalies.io/"
+const HOST = "https://yalies.io/";
 
 const tabs: Tab[] = [
-	{ url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F", icon: "home" },
+	{
+		url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F",
+		icon: "home",
+	},
 	{ url: HOST + "about", icon: "information-circle" },
 	{ url: HOST + "faq", icon: "help-circle" },
 	{ url: HOST + "logout/", icon: "exit" },
@@ -120,7 +119,7 @@ function App() {
 						key={index}
 						onPress={() => {
 							setActiveTab(index);
-							if (tab.icon === "exit-outline") {
+							if (tab.icon === "exit") {
 								handleLogoutPress();
 							}
 						}}
@@ -139,7 +138,7 @@ function App() {
 }
 
 const WebViewScreen = ({ url }: { url: string }) => {
-    let hasAuthenticated = false;
+	let hasAuthenticated = false;
 	const webViewRef = React.useRef<WebView>(null);
 
 	const hideElementsScript = `
@@ -195,9 +194,9 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			ref={webViewRef}
 			onLoadEnd={handleLoadEnd}
 			source={{
-                uri: url,
-                headers: getHeaders(),
-            }}
+				uri: url,
+				headers: getHeaders(),
+			}}
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
