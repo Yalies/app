@@ -31,8 +31,8 @@ const tabs: Tab[] = [
 ];
 
 const Colors = {
-	darker: "#121212",
-	lighter: "#F3F3F3",
+	darker: "#00356b",
+	lighter: "#fff",
 };
 
 const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
