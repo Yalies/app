@@ -188,7 +188,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
             headers: await getHeaders(),
         });
     };
-    const authorize = (ticket) => post('authorize/cas', null, { params: { ticket: ticket } });
+    const authorize = (ticket) => post('authorize', null, { params: { ticket: ticket } });
 
 	return (
 		<WebView
@@ -218,16 +218,21 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			style={{ flex: 1 }}
             onNavigationStateChange={({ url }) => {
                 if (!hasAuthenticated && url.includes('ticket=')) {
-                    console.log('DOING AUTH' + url)
                     // Prevent multiple firings
                     hasAuthenticated = true;
+                    console.log('DOING AUTH' + url)
                     try {
                         // TODO: this is fragile and would break if there were other URL parameters. Create better solution?
                         let ticket = url.split('ticket=')[1];
+                        console.log('DOING AUTH' + ticket)
                         authorize(ticket).then((authorization) => {
                             let { user, token } = authorization;
                             login(user, token);
                             console.log('Just did login!');
+                        })
+                        .catch((err) => {
+                            console.log('Something went wrong with the auth!');
+                            console.log(err);
                         });
                     } catch (e) {
                         alert('Sorry, CAS rejected your login. Please try again later.');
