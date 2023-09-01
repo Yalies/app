@@ -24,7 +24,7 @@ const HOST = "https://yalies.io/";
 
 const tabs: Tab[] = [
 	{
-		url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F",
+		url: HOST + "login/",
 		icon: "home",
 	},
 	{ url: HOST + "about", icon: "information-circle" },
@@ -163,9 +163,8 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
-    const login = (user, token) => {
+    const login = (token) => {
         return AsyncStorage.multiSet([
-            ['@user', JSON.stringify(user)],
             ['@token', token],
         ]);
     };
@@ -176,7 +175,10 @@ const WebViewScreen = ({ url }: { url: string }) => {
         let headers = {};
         let token = await getToken();
         if (token) {
-            headers['Authorization'] = 'Bearer ' + token;
+            headers = {
+                ...headers,
+                'Authorization': 'Bearer ' + token,
+            };
         }
         console.log(headers);
         return headers;
@@ -215,28 +217,26 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				);
 			}}
 			style={{ flex: 1 }}
-            onNavigationStateChange={({ url }) => {
+            onShouldStartLoadWithRequest={({ url }) => {
                 if (!hasAuthenticated && url.includes('ticket=')) {
                     // Prevent multiple firings
                     hasAuthenticated = true;
-                    console.log('DOING AUTH' + url)
                     try {
                         // TODO: this is fragile and would break if there were other URL parameters. Create better solution?
                         let ticket = url.split('ticket=')[1];
                         console.log('DOING AUTH' + ticket)
                         authorize(ticket).then((authorization) => {
-                            let { user, token } = authorization;
-                            login(user, token);
+                            console.log(authorization.data);
+                            let { token } = authorization.data;
+                            login(token);
                             console.log('Just did login!');
-                        })
-                        .catch((err) => {
-                            console.log('Something went wrong with the auth!');
-                            console.log(err);
                         });
                     } catch (e) {
                         alert('Sorry, CAS rejected your login. Please try again later.');
                     }
+                    return false;
                 }
+                return true;
             }}
 		/>
 	);
