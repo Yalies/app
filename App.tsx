@@ -12,22 +12,21 @@ import { WebView } from "react-native-webview";
 import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import axios from 'axios';
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Tab = {
 	url: string;
-	icon:
-		| "home-outline"
-		| "information-circle-outline"
-		| "help-circle-outline"
-		| "exit-outline";
+	icon: "home" | "information-circle" | "help-circle" | "exit";
 };
 
-const HOST = "https://yalies.io/"
+const HOST = "https://yalies.io/";
 
 const tabs: Tab[] = [
-	{ url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F", icon: "home" },
+	{
+		url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F",
+		icon: "home",
+	},
 	{ url: HOST + "about", icon: "information-circle" },
 	{ url: HOST + "faq", icon: "help-circle" },
 	{ url: HOST + "logout/", icon: "exit" },
@@ -120,7 +119,7 @@ function App() {
 						key={index}
 						onPress={() => {
 							setActiveTab(index);
-							if (tab.icon === "exit-outline") {
+							if (tab.icon === "exit") {
 								handleLogoutPress();
 							}
 						}}
@@ -139,7 +138,7 @@ function App() {
 }
 
 const WebViewScreen = ({ url }: { url: string }) => {
-    let hasAuthenticated = false;
+	let hasAuthenticated = false;
 	const webViewRef = React.useRef<WebView>(null);
 
 	const hideElementsScript = `
@@ -164,40 +163,43 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
-    const login = (user, token) => {
-        return AsyncStorage.multiSet([
-            ['@user', JSON.stringify(user)],
-            ['@token', token],
-        ]);
-    };
-    const getToken = async () => {
-        return await AsyncStorage.getItem('@token');
-    };
-    const getHeaders = async () => {
-        let headers = {};
-        let token = await getToken();
-        if (token) {
-            headers['Authorization'] = 'Bearer ' + token;
-        }
-        console.log(headers);
-        return headers;
-    };
-    const post = async (endpoint, data = null, options = null) => {
-        return axios.post(HOST + endpoint, data, {
-            ...options,
-            headers: await getHeaders(),
-        });
-    };
-    const authorize = (ticket) => post('authorize/cas', null, { params: { ticket: ticket } });
+	const login = (user: any, token: any) => {
+		return AsyncStorage.multiSet([
+			["@user", JSON.stringify(user)],
+			["@token", token],
+		]);
+	};
+	const getToken = async () => {
+		return await AsyncStorage.getItem("@token");
+	};
+	const getHeaders = async () => {
+		let headers = {
+			Authorization: "",
+		};
+		let token = await getToken();
+		if (token) {
+			headers["Authorization"] = "Bearer " + token;
+		}
+		console.log(headers);
+		return headers;
+	};
+	const post = async (endpoint: any, data = null, options: any = null) => {
+		return axios.post(HOST + endpoint, data, {
+			...options,
+			headers: await getHeaders(),
+		});
+	};
+	const authorize = (ticket: any) =>
+		post("authorize/cas", null, { params: { ticket: ticket } });
 
 	return (
 		<WebView
 			ref={webViewRef}
 			onLoadEnd={handleLoadEnd}
 			source={{
-                uri: url,
-                headers: getHeaders(),
-            }}
+				uri: url,
+				headers: getHeaders(),
+			}}
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
@@ -216,24 +218,24 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				);
 			}}
 			style={{ flex: 1 }}
-            onNavigationStateChange={({ url }) => {
-                if (!hasAuthenticated && url.includes('ticket=')) {
-                    console.log('DOING AUTH' + url)
-                    // Prevent multiple firings
-                    hasAuthenticated = true;
-                    try {
-                        // TODO: this is fragile and would break if there were other URL parameters. Create better solution?
-                        let ticket = url.split('ticket=')[1];
-                        authorize(ticket).then((authorization) => {
-                            let { user, token } = authorization;
-                            login(user, token);
-                            console.log('Just did login!');
-                        });
-                    } catch (e) {
-                        alert('Sorry, CAS rejected your login. Please try again later.');
-                    }
-                }
-            }}
+			onNavigationStateChange={({ url }) => {
+				if (!hasAuthenticated && url.includes("ticket=")) {
+					console.log("DOING AUTH" + url);
+					// Prevent multiple firings
+					hasAuthenticated = true;
+					try {
+						// TODO: this is fragile and would break if there were other URL parameters. Create better solution?
+						let ticket = url.split("ticket=")[1];
+						authorize(ticket).then((authorization: any) => {
+							let { user, token } = authorization;
+							login(user, token);
+							console.log("Just did login!");
+						});
+					} catch (e) {
+						alert("Sorry, CAS rejected your login. Please try again later.");
+					}
+				}
+			}}
 		/>
 	);
 };
