@@ -59,12 +59,12 @@ const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 			colors={["#00356B", "#0088CC"]}
 			style={styles.landingContainer}
 		>
-			<Text style={styles.title}>yalies</Text>
-			<Text style={styles.subtitle}>the app</Text>
+			<Text style={styles.title}>Yalies</Text>
+			<Text style={styles.subtitle}>The App</Text>
 			<TouchableOpacity style={styles.loginButton} onPress={handleLoginPress}>
-				<Text style={styles.buttonText}>log in with netid</Text>
+				<Text style={styles.buttonText}>Log in with CAS</Text>
 			</TouchableOpacity>
-			<Text style={styles.subText}>make sure you click "save for 90 days"</Text>
+			<Text style={styles.subText}>Make sure to click "save for 90 days"</Text>
 		</LinearGradient>
 	);
 };
