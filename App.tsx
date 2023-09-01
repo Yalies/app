@@ -24,10 +24,10 @@ type Tab = {
 };
 
 const tabs: Tab[] = [
-	{ url: "https://yalies.io/login/", icon: "home-outline" },
-	{ url: "https://yalies.io/about", icon: "information-circle-outline" },
-	{ url: "https://yalies.io/faq", icon: "help-circle-outline" },
-	{ url: "https://yalies.io/logout/", icon: "exit-outline" },
+	{ url: "https://yalies.io/login/", icon: "home" },
+	{ url: "https://yalies.io/about", icon: "information-circle" },
+	{ url: "https://yalies.io/faq", icon: "help-circle" },
+	{ url: "https://yalies.io/logout/", icon: "exit" },
 ];
 
 const Colors = {
