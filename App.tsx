@@ -24,11 +24,13 @@ type Tab = {
 		| "exit-outline";
 };
 
+const HOST = "https://yalies.io/"
+
 const tabs: Tab[] = [
-	{ url: "https://yalies.io/login/", icon: "home" },
-	{ url: "https://yalies.io/about", icon: "information-circle" },
-	{ url: "https://yalies.io/faq", icon: "help-circle" },
-	{ url: "https://yalies.io/logout/", icon: "exit" },
+	{ url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F", icon: "home" },
+	{ url: HOST + "about", icon: "information-circle" },
+	{ url: HOST + "faq", icon: "help-circle" },
+	{ url: HOST + "logout/", icon: "exit" },
 ];
 
 const Colors = {
@@ -162,17 +164,40 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
+    const login = (user, token) => {
+        return AsyncStorage.multiSet([
+            ['@user', JSON.stringify(user)],
+            ['@token', token],
+        ]);
+    };
+    const getToken = async () => {
+        return await AsyncStorage.getItem('@token');
+    };
+    const getHeaders = async () => {
+        let headers = {};
+        let token = await getToken();
+        if (token) {
+            headers['Authorization'] = 'Bearer ' + token;
+        }
+        console.log(headers);
+        return headers;
+    };
     const post = async (endpoint, data = null, options = null) => {
         return axios.post(HOST + endpoint, data, {
             ...options,
             headers: await getHeaders(),
+        });
+    };
     const authorize = (ticket) => post('authorize/cas', null, { params: { ticket: ticket } });
 
 	return (
 		<WebView
 			ref={webViewRef}
 			onLoadEnd={handleLoadEnd}
-			source={{ uri: url }}
+			source={{
+                uri: url,
+                headers: getHeaders(),
+            }}
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
@@ -193,6 +218,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			style={{ flex: 1 }}
             onNavigationStateChange={({ url }) => {
                 if (!hasAuthenticated && url.includes('ticket=')) {
+                    console.log('DOING AUTH' + url)
                     // Prevent multiple firings
                     hasAuthenticated = true;
                     try {
@@ -200,7 +226,8 @@ const WebViewScreen = ({ url }: { url: string }) => {
                         let ticket = url.split('ticket=')[1];
                         authorize(ticket).then((authorization) => {
                             let { user, token } = authorization;
-                            login(user, token).then(navigation.goBack);
+                            login(user, token);
+                            console.log('Just did login!');
                         });
                     } catch (e) {
                         alert('Sorry, CAS rejected your login. Please try again later.');
