@@ -126,7 +126,7 @@ function App() {
 						<Ionicons
 							name={tab.icon}
 							size={20}
-							color={isDarkMode ? "#fff" : "#000"}
+							color={isDarkMode ? "#fff" : "#00356b"}
 						/>
 					</TouchableOpacity>
 				))}
