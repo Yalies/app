@@ -12,6 +12,7 @@ import { WebView } from "react-native-webview";
 import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Tab = {
