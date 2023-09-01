@@ -139,20 +139,20 @@ const WebViewScreen = ({ url }: { url: string }) => {
 	const webViewRef = React.useRef<WebView>(null);
 
 	const hideElementsScript = `
-    window.ReactNativeWebView.postMessage(document.cookie);
+        window.ReactNativeWebView.postMessage(document.cookie);
 
-    var banner = document.querySelector(".banner");
-    if (banner) {
-      banner.style.display = "none";
-    }
+        var banner = document.querySelector(".banner");
+        if (banner) {
+          banner.style.display = "none";
+        }
 
-    var nav = document.querySelector("nav");
-    if (nav) {
-      nav.style.display = "none";
-    }
+        var nav = document.querySelector("nav");
+        if (nav) {
+          nav.style.display = "none";
+        }
 
-    void(0); // void(0) ensures the injected script does not return anything
-  `;
+        void(0); // void(0) ensures the injected script does not return anything
+    `;
 
 	const handleLoadEnd = () => {
 		if (webViewRef.current) {
@@ -169,7 +169,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
 			}}
-			userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.3"
+			userAgent="Yalies Mobile App"
 			onLoad={() => console.log("WebView loaded!")}
 			sharedCookiesEnabled={true}
 			thirdPartyCookiesEnabled={true}
