@@ -137,6 +137,7 @@ function App() {
 }
 
 const WebViewScreen = ({ url }: { url: string }) => {
+    let hasAuthenticated = false;
 	const webViewRef = React.useRef<WebView>(null);
 
 	const hideElementsScript = `
@@ -161,6 +162,12 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
+    const post = async (endpoint, data = null, options = null) => {
+        return axios.post(HOST + endpoint, data, {
+            ...options,
+            headers: await getHeaders(),
+    const authorize = (ticket) => post('authorize/cas', null, { params: { ticket: ticket } });
+
 	return (
 		<WebView
 			ref={webViewRef}
@@ -184,6 +191,22 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				);
 			}}
 			style={{ flex: 1 }}
+            onNavigationStateChange={({ url }) => {
+                if (!hasAuthenticated && url.includes('ticket=')) {
+                    // Prevent multiple firings
+                    hasAuthenticated = true;
+                    try {
+                        // TODO: this is fragile and would break if there were other URL parameters. Create better solution?
+                        let ticket = url.split('ticket=')[1];
+                        authorize(ticket).then((authorization) => {
+                            let { user, token } = authorization;
+                            login(user, token).then(navigation.goBack);
+                        });
+                    } catch (e) {
+                        alert('Sorry, CAS rejected your login. Please try again later.');
+                    }
+                }
+            }}
 		/>
 	);
 };
@@ -191,8 +214,6 @@ const WebViewScreen = ({ url }: { url: string }) => {
 const styles = StyleSheet.create({
 	tabContainer: {
 		flexDirection: "row",
-		borderTopWidth: 1,
-		borderColor: "#ccc",
 	},
 	tabButton: {
 		flex: 1,
