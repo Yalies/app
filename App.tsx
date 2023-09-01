@@ -66,7 +66,7 @@ const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 			<TouchableOpacity style={styles.loginButton} onPress={handleLoginPress}>
 				<Text style={styles.buttonText}>Log in with CAS</Text>
 			</TouchableOpacity>
-			<Text style={styles.subText}>Make sure to click "save for 90 days"</Text>
+			<Text style={styles.subText}>Each login lasts for 90 days</Text>
 		</LinearGradient>
 	);
 };
