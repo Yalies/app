@@ -12,8 +12,9 @@ import { WebView } from "react-native-webview";
 import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { logout, login, getToken, getHeaders, post, authorize } from './api';
 
 type Tab = {
 	url: string;
@@ -103,6 +104,7 @@ function App() {
 	// Function to handle login button press
 	const handleLogoutPress = async () => {
 		await AsyncStorage.setItem("isLogged", "false"); // Save login status
+        logout();
 		setShowLandingScreen(true);
 	};
 
@@ -163,40 +165,14 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
-    const login = (token) => {
-        return AsyncStorage.multiSet([
-            ['@token', token],
-        ]);
-    };
-    const getToken = async () => {
-        return await AsyncStorage.getItem('@token');
-    };
-    const getHeaders = async () => {
-        let headers = {};
-        let token = await getToken();
-        if (token) {
-            headers = {
-                ...headers,
-                'Authorization': 'Bearer ' + token,
-            };
-        }
-        console.log(headers);
-        return headers;
-    };
-    const post = async (endpoint, data = null, options = null) => {
-        return axios.post(HOST + endpoint, data, {
-            ...options,
-            headers: await getHeaders(),
-        });
-    };
-    const authorize = (ticket) => post('authorize', null, { params: { ticket: ticket } });
+    const [currentUrl, setCurrentUrl] = useState(url);
 
 	return (
 		<WebView
 			ref={webViewRef}
 			onLoadEnd={handleLoadEnd}
 			source={{
-				uri: url,
+				uri: currentUrl,
 				headers: getHeaders(),
 			}}
 			onError={(syntheticEvent) => {
@@ -230,6 +206,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
                             let { token } = authorization.data;
                             login(token);
                             console.log('Just did login!');
+                            setCurrentUrl('https://yalies.io/');
                         });
                     } catch (e) {
                         alert('Sorry, CAS rejected your login. Please try again later.');
