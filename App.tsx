@@ -100,6 +100,7 @@ function App() {
 
 	// Function to handle login button press
 	const handleLogoutPress = async () => {
+        // TODO: let's combine this with the @token property that we also have to store to maintain login state
 		await AsyncStorage.setItem("isLogged", "false"); // Save login status
         logout();
 		setShowLandingScreen(true);
