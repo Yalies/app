@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { logout, login, getToken, getHeaders, post, authorize } from './api';
+import { logout, login, getToken, getHeaders, post, authorize } from "./api";
 
 type Tab = {
 	url: string;
@@ -37,6 +37,11 @@ const Colors = {
 
 const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 	// Check if the user is already logged in when the component mounts
+	const checkLoginStatus = async () => {
+		const isLogged = await AsyncStorage.getItem("isLogged");
+		return isLogged === "true";
+	};
+
 	useEffect(() => {
 		const checkLoginStatus = async () => {
 			const isLogged = await AsyncStorage.getItem("isLogged");
@@ -64,7 +69,7 @@ const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 			<TouchableOpacity style={styles.loginButton} onPress={handleLoginPress}>
 				<Text style={styles.buttonText}>Log in with CAS</Text>
 			</TouchableOpacity>
-			<Text style={styles.subText}>Make sure to click "save for 90 days"</Text>
+			<Text style={styles.subText}>Each login lasts for 90 days</Text>
 		</LinearGradient>
 	);
 };
@@ -72,7 +77,19 @@ const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 function App() {
 	const isDarkMode = useColorScheme() === "dark";
 	const [showLandingScreen, setShowLandingScreen] = useState(true);
-	const [activeTab, setActiveTab] = useState(0);
+	const [activeTab, setActiveTab] = useState(1); // Initialize to "About" tab
+
+	useEffect(() => {
+		const checkLoginStatus = async () => {
+			const isLogged = await AsyncStorage.getItem("isLogged");
+			if (isLogged === "true") {
+				setActiveTab(0); // Set to "Home" tab
+				setShowLandingScreen(false); // Hide landing screen
+			}
+		};
+
+		checkLoginStatus();
+	}, []);
 
 	const safeAreaStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -102,7 +119,7 @@ function App() {
 	const handleLogoutPress = async () => {
         // TODO: let's combine this with the @token property that we also have to store to maintain login state
 		await AsyncStorage.setItem("isLogged", "false"); // Save login status
-        logout();
+		logout();
 		setShowLandingScreen(true);
 	};
 
@@ -163,7 +180,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
-    const [currentUrl, setCurrentUrl] = useState(url);
+	const [currentUrl, setCurrentUrl] = useState(url);
 
 	return (
 		<WebView
@@ -191,28 +208,28 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				);
 			}}
 			style={{ flex: 1 }}
-            onShouldStartLoadWithRequest={({ url }) => {
-                if (!hasAuthenticated && url.includes('ticket=')) {
-                    // Prevent multiple firings
-                    hasAuthenticated = true;
-                    try {
-                        // TODO: this is fragile and would break if there were other URL parameters. Create better solution?
-                        let ticket = url.split('ticket=')[1];
-                        console.log('DOING AUTH' + ticket)
-                        authorize(ticket).then((authorization) => {
-                            console.log(authorization.data);
-                            let { token } = authorization.data;
-                            login(token);
-                            console.log('Just did login!');
-                            setCurrentUrl('https://yalies.io/');
-                        });
-                    } catch (e) {
-                        alert('Sorry, CAS rejected your login. Please try again later.');
-                    }
-                    return false;
-                }
-                return true;
-            }}
+			onShouldStartLoadWithRequest={({ url }) => {
+				if (!hasAuthenticated && url.includes("ticket=")) {
+					// Prevent multiple firings
+					hasAuthenticated = true;
+					try {
+						// TODO: this is fragile and would break if there were other URL parameters. Create better solution?
+						let ticket = url.split("ticket=")[1];
+						console.log("DOING AUTH" + ticket);
+						authorize(ticket).then((authorization) => {
+							console.log(authorization.data);
+							let { token } = authorization.data;
+							login(token);
+							console.log("Just did login!");
+							setCurrentUrl("https://yalies.io/");
+						});
+					} catch (e) {
+						alert("Sorry, CAS rejected your login. Please try again later.");
+					}
+					return false;
+				}
+				return true;
+			}}
 		/>
 	);
 };
