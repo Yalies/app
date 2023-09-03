@@ -12,8 +12,9 @@ import { WebView } from "react-native-webview";
 import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { logout, login, getToken, getHeaders, post, authorize } from './api';
 
 type Tab = {
 	url: string;
@@ -23,10 +24,7 @@ type Tab = {
 const HOST = "https://yalies.io/";
 
 const tabs: Tab[] = [
-	{
-		url: "https://secure.its.yale.edu/cas/login?service=http%3A%2F%2Fyalies.io%2Fdummy%2F",
-		icon: "home",
-	},
+	{ url: HOST + "login/", icon: "home" },
 	{ url: HOST + "about", icon: "information-circle" },
 	{ url: HOST + "faq", icon: "help-circle" },
 	{ url: HOST + "logout/", icon: "exit" },
@@ -103,6 +101,7 @@ function App() {
 	// Function to handle login button press
 	const handleLogoutPress = async () => {
 		await AsyncStorage.setItem("isLogged", "false"); // Save login status
+        logout();
 		setShowLandingScreen(true);
 	};
 
@@ -163,41 +162,14 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		}
 	};
 
-	const login = (user: any, token: any) => {
-		return AsyncStorage.multiSet([
-			["@user", JSON.stringify(user)],
-			["@token", token],
-		]);
-	};
-	const getToken = async () => {
-		return await AsyncStorage.getItem("@token");
-	};
-	const getHeaders = async () => {
-		let headers = {
-			Authorization: "",
-		};
-		let token = await getToken();
-		if (token) {
-			headers["Authorization"] = "Bearer " + token;
-		}
-		console.log(headers);
-		return headers;
-	};
-	const post = async (endpoint: any, data = null, options: any = null) => {
-		return axios.post(HOST + endpoint, data, {
-			...options,
-			headers: await getHeaders(),
-		});
-	};
-	const authorize = (ticket: any) =>
-		post("authorize/cas", null, { params: { ticket: ticket } });
+    const [currentUrl, setCurrentUrl] = useState(url);
 
 	return (
 		<WebView
 			ref={webViewRef}
 			onLoadEnd={handleLoadEnd}
 			source={{
-				uri: url,
+				uri: currentUrl,
 				headers: getHeaders(),
 			}}
 			onError={(syntheticEvent) => {
@@ -218,24 +190,28 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				);
 			}}
 			style={{ flex: 1 }}
-			onNavigationStateChange={({ url }) => {
-				if (!hasAuthenticated && url.includes("ticket=")) {
-					console.log("DOING AUTH" + url);
-					// Prevent multiple firings
-					hasAuthenticated = true;
-					try {
-						// TODO: this is fragile and would break if there were other URL parameters. Create better solution?
-						let ticket = url.split("ticket=")[1];
-						authorize(ticket).then((authorization: any) => {
-							let { user, token } = authorization;
-							login(user, token);
-							console.log("Just did login!");
-						});
-					} catch (e) {
-						alert("Sorry, CAS rejected your login. Please try again later.");
-					}
-				}
-			}}
+            onShouldStartLoadWithRequest={({ url }) => {
+                if (!hasAuthenticated && url.includes('ticket=')) {
+                    // Prevent multiple firings
+                    hasAuthenticated = true;
+                    try {
+                        // TODO: this is fragile and would break if there were other URL parameters. Create better solution?
+                        let ticket = url.split('ticket=')[1];
+                        console.log('DOING AUTH' + ticket)
+                        authorize(ticket).then((authorization) => {
+                            console.log(authorization.data);
+                            let { token } = authorization.data;
+                            login(token);
+                            console.log('Just did login!');
+                            setCurrentUrl('https://yalies.io/');
+                        });
+                    } catch (e) {
+                        alert('Sorry, CAS rejected your login. Please try again later.');
+                    }
+                    return false;
+                }
+                return true;
+            }}
 		/>
 	);
 };
