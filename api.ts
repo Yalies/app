@@ -22,12 +22,8 @@ export const getHeaders = async () => {
     let headers = {};
     let token = await getToken();
     if (token) {
-        headers = {
-            ...headers,
-            'Authorization': 'Bearer ' + token,
-        };
+        headers['Authorization'] = 'Bearer ' + token;
     }
-    console.log(headers);
     return headers;
 };
 export const post = async (endpoint, data = null, options = null) => {
