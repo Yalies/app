@@ -24,10 +24,7 @@ type Tab = {
 const HOST = "https://yalies.io/";
 
 const tabs: Tab[] = [
-	{
-		url: HOST + "login/",
-		icon: "home",
-	},
+	{ url: HOST + "login/", icon: "home" },
 	{ url: HOST + "about", icon: "information-circle" },
 	{ url: HOST + "faq", icon: "help-circle" },
 	{ url: HOST + "logout/", icon: "exit" },
