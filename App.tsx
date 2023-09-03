@@ -1,4 +1,3 @@
-// import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState, useRef } from "react";
 import {
 	View,
@@ -21,27 +20,12 @@ type Tab = {
 	icon: "home" | "information-circle" | "help-circle" | "exit";
 };
 
+// Constants
 const HOST = "https://yalies.io/";
-
-// const tabs: Tab[] = [
-// 	{ url: HOST + "login/", icon: "home" },
-// 	{ url: HOST + "about", icon: "information-circle" },
-// 	{ url: HOST + "faq", icon: "help-circle" },
-// 	{ url: HOST + "logout/", icon: "exit" },
-// ];
-
-const Colors = {
-	darker: "#00356b",
-	lighter: "#fff",
-};
+const Colors = { darker: "#00356b", lighter: "#fff" };
 
 const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 	// Check if the user is already logged in when the component mounts
-	const checkLoginStatus = async () => {
-		const isLogged = await AsyncStorage.getItem("isLogged");
-		return isLogged === "true";
-	};
-
 	useEffect(() => {
 		const checkLoginStatus = async () => {
 			const isLogged = await AsyncStorage.getItem("isLogged");
@@ -55,7 +39,7 @@ const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 
 	// Function to handle login button press
 	const handleLoginPress = async () => {
-		await AsyncStorage.setItem("isLogged", "true"); // Save login status
+		await AsyncStorage.setItem("isLogged", "true");
 		onLoginPress();
 	};
 
@@ -91,7 +75,7 @@ function App() {
 			if (isLogged === "true") {
 				// Update the tabs state to show the home URL instead of the login URL
 				setTabs([
-					{ url: HOST + "/", icon: "home" },
+					{ url: HOST + "", icon: "home" },
 					{ url: HOST + "about", icon: "information-circle" },
 					{ url: HOST + "faq", icon: "help-circle" },
 					{ url: HOST + "logout/", icon: "exit" },
@@ -110,11 +94,17 @@ function App() {
 		checkLoginStatus();
 	}, []);
 
+	// Function to handle logout button press
+	const handleLogoutPress = async () => {
+		await AsyncStorage.setItem("isLogged", "false");
+		await logout();
+		setShowLandingScreen(true);
+	};
+
 	const safeAreaStyle = {
 		backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 		flex: 1,
 	};
-
 	const statusBarStyle = isDarkMode ? "light-content" : "dark-content";
 
 	if (showLandingScreen) {
@@ -134,14 +124,6 @@ function App() {
 		);
 	}
 
-	// Function to handle login button press
-	const handleLogoutPress = async () => {
-        // TODO: let's combine this with the @token property that we also have to store to maintain login state
-		await AsyncStorage.setItem("isLogged", "false"); // Save login status
-		logout();
-		setShowLandingScreen(true);
-	};
-
 	return (
 		<SafeAreaView style={safeAreaStyle}>
 			<StatusBar
@@ -153,10 +135,11 @@ function App() {
 				{tabs.map((tab, index) => (
 					<TouchableOpacity
 						key={index}
-						onPress={() => {
+						onPress={async () => {
+							console.log(tabs[activeTab].url);
 							setActiveTab(index);
 							if (tab.icon === "exit") {
-								handleLogoutPress();
+								await handleLogoutPress();
 							}
 						}}
 						style={styles.tabButton}
@@ -201,13 +184,17 @@ const WebViewScreen = ({ url }: { url: string }) => {
 
 	const [currentUrl, setCurrentUrl] = useState(url);
 
+	useEffect(() => {
+		setCurrentUrl(url);
+	}, [url]);
+
 	return (
 		<WebView
 			ref={webViewRef}
 			onLoadEnd={handleLoadEnd}
 			source={{
 				uri: currentUrl,
-				headers: getHeaders(),
+				// headers: getHeaders(),
 			}}
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
