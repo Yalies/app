@@ -23,12 +23,12 @@ type Tab = {
 
 const HOST = "https://yalies.io/";
 
-const tabs: Tab[] = [
-	{ url: HOST + "login/", icon: "home" },
-	{ url: HOST + "about", icon: "information-circle" },
-	{ url: HOST + "faq", icon: "help-circle" },
-	{ url: HOST + "logout/", icon: "exit" },
-];
+// const tabs: Tab[] = [
+// 	{ url: HOST + "login/", icon: "home" },
+// 	{ url: HOST + "about", icon: "information-circle" },
+// 	{ url: HOST + "faq", icon: "help-circle" },
+// 	{ url: HOST + "logout/", icon: "exit" },
+// ];
 
 const Colors = {
 	darker: "#00356b",
@@ -77,14 +77,33 @@ const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 function App() {
 	const isDarkMode = useColorScheme() === "dark";
 	const [showLandingScreen, setShowLandingScreen] = useState(true);
-	const [activeTab, setActiveTab] = useState(1); // Initialize to "About" tab
+	const [tabs, setTabs] = useState<Tab[]>([
+		{ url: HOST + "login/", icon: "home" },
+		{ url: HOST + "about", icon: "information-circle" },
+		{ url: HOST + "faq", icon: "help-circle" },
+		{ url: HOST + "logout/", icon: "exit" },
+	]);
+	const [activeTab, setActiveTab] = useState(0);
 
 	useEffect(() => {
 		const checkLoginStatus = async () => {
 			const isLogged = await AsyncStorage.getItem("isLogged");
 			if (isLogged === "true") {
-				setActiveTab(0); // Set to "Home" tab
-				setShowLandingScreen(false); // Hide landing screen
+				// Update the tabs state to show the home URL instead of the login URL
+				setTabs([
+					{ url: HOST + "/", icon: "home" },
+					{ url: HOST + "about", icon: "information-circle" },
+					{ url: HOST + "faq", icon: "help-circle" },
+					{ url: HOST + "logout/", icon: "exit" },
+				]);
+			} else {
+				// Optional: Reset to default tabs if not logged in
+				setTabs([
+					{ url: HOST + "login/", icon: "home" },
+					{ url: HOST + "about", icon: "information-circle" },
+					{ url: HOST + "faq", icon: "help-circle" },
+					{ url: HOST + "logout/", icon: "exit" },
+				]);
 			}
 		};
 
