@@ -159,14 +159,19 @@ function App() {
 const WebViewScreen = ({ url }: { url: string }) => {
 	let hasAuthenticated = false;
 	const webViewRef = React.useRef<WebView>(null);
+	const [currentUrl, setCurrentUrl] = useState(url);
 	const [headers, setHeaders] = useState({});
+
+	useEffect(() => {
+		setCurrentUrl(url);
+	}, [url]);
 
 	useEffect(() => {
 		(async () => {
 			const newHeaders = await getHeaders();
 			setHeaders(newHeaders);
 		})();
-	}, []);
+	}, [currentUrl]);
 
 	const hideElementsScript = `
         window.ReactNativeWebView.postMessage(document.cookie);
@@ -189,12 +194,6 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			webViewRef.current?.injectJavaScript(hideElementsScript);
 		}
 	};
-
-	const [currentUrl, setCurrentUrl] = useState(url);
-
-	useEffect(() => {
-		setCurrentUrl(url);
-	}, [url]);
 
 	return (
 		<WebView
