@@ -159,6 +159,14 @@ function App() {
 const WebViewScreen = ({ url }: { url: string }) => {
 	let hasAuthenticated = false;
 	const webViewRef = React.useRef<WebView>(null);
+	const [headers, setHeaders] = useState({});
+
+	useEffect(() => {
+		(async () => {
+			const newHeaders = await getHeaders();
+			setHeaders(newHeaders);
+		})();
+	}, []);
 
 	const hideElementsScript = `
         window.ReactNativeWebView.postMessage(document.cookie);
@@ -194,7 +202,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			onLoadEnd={handleLoadEnd}
 			source={{
 				uri: currentUrl,
-				// headers: getHeaders(),
+				headers: headers,
 			}}
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
