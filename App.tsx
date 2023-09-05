@@ -173,6 +173,16 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		})();
 	}, [currentUrl]);
 
+    const injectHeadersScript = (headers) => `
+      (function() {
+        var open = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function() {
+          open.apply(this, arguments);
+          this.setRequestHeader("Authorization", "${headers.Authorization}");
+        };
+      })();
+    `;
+
 	const hideElementsScript = `
         window.ReactNativeWebView.postMessage(document.cookie);
 
@@ -207,6 +217,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
 			}}
+            injectedJavaScript={injectHeadersScript(headers)}
 			userAgent="Yalies Mobile App"
 			onLoad={() => console.log("WebView loaded!")}
 			sharedCookiesEnabled={true}
