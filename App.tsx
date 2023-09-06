@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { logout, login, getToken, getHeaders, post, authorize } from "./api";
+// import { logout, login, getToken, getHeaders, post, authorize } from "./api";
 
 type Tab = {
 	url: string;
@@ -72,23 +72,24 @@ function App() {
 	useEffect(() => {
 		const checkLoginStatus = async () => {
 			const isLogged = await AsyncStorage.getItem("isLogged");
-			if (isLogged === "true") {
-				// Update the tabs state to show the home URL instead of the login URL
-				setTabs([
-					{ url: HOST + "", icon: "home" },
-					{ url: HOST + "about", icon: "information-circle" },
-					{ url: HOST + "faq", icon: "help-circle" },
-					{ url: HOST + "logout/", icon: "exit" },
-				]);
-			} else {
-				// Optional: Reset to default tabs if not logged in
-				setTabs([
-					{ url: HOST + "login/", icon: "home" },
-					{ url: HOST + "about", icon: "information-circle" },
-					{ url: HOST + "faq", icon: "help-circle" },
-					{ url: HOST + "logout/", icon: "exit" },
-				]);
-			}
+			console.log("isloggedin: ", isLogged);
+			// 	if (isLogged === "true") {
+			// 		// Update the tabs state to show the home URL instead of the login URL
+			// 		setTabs([
+			// 			{ url: HOST + "", icon: "home" },
+			// 			{ url: HOST + "about", icon: "information-circle" },
+			// 			{ url: HOST + "faq", icon: "help-circle" },
+			// 			{ url: HOST + "logout/", icon: "exit" },
+			// 		]);
+			// 	} else {
+			// 		// Optional: Reset to default tabs if not logged in
+			// 		setTabs([
+			// 			{ url: HOST + "login/", icon: "home" },
+			// 			{ url: HOST + "about", icon: "information-circle" },
+			// 			{ url: HOST + "faq", icon: "help-circle" },
+			// 			{ url: HOST + "logout/", icon: "exit" },
+			// 		]);
+			// 	}
 		};
 
 		checkLoginStatus();
@@ -97,7 +98,7 @@ function App() {
 	// Function to handle logout button press
 	const handleLogoutPress = async () => {
 		await AsyncStorage.setItem("isLogged", "false");
-		await logout();
+		// await logout();
 		setShowLandingScreen(true);
 	};
 
@@ -160,28 +161,19 @@ const WebViewScreen = ({ url }: { url: string }) => {
 	let hasAuthenticated = false;
 	const webViewRef = React.useRef<WebView>(null);
 	const [currentUrl, setCurrentUrl] = useState(url);
-	const [headers, setHeaders] = useState({});
+	// const [headers, setHeaders] = useState({});
 
 	useEffect(() => {
 		setCurrentUrl(url);
 	}, [url]);
 
-	useEffect(() => {
-		(async () => {
-			const newHeaders = await getHeaders();
-			setHeaders(newHeaders);
-		})();
-	}, [currentUrl]);
-
-    const injectHeadersScript = (headers) => `
-      (function() {
-        var open = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function() {
-          open.apply(this, arguments);
-          this.setRequestHeader("Authorization", "${headers.Authorization}");
-        };
-      })();
-    `;
+	// useEffect(() => {
+	// 	(async () => {
+	// 		const newHeaders = await getHeaders();
+	// 		setHeaders(newHeaders);
+	// 		console.log(currentUrl, ": ", headers);
+	// 	})();
+	// }, [currentUrl]);
 
 	const hideElementsScript = `
         window.ReactNativeWebView.postMessage(document.cookie);
@@ -211,13 +203,12 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			onLoadEnd={handleLoadEnd}
 			source={{
 				uri: currentUrl,
-				headers: headers,
+				// headers: getHeaders()
 			}}
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
 			}}
-            injectedJavaScript={injectHeadersScript(headers)}
 			userAgent="Yalies Mobile App"
 			onLoad={() => console.log("WebView loaded!")}
 			sharedCookiesEnabled={true}
@@ -232,28 +223,28 @@ const WebViewScreen = ({ url }: { url: string }) => {
 				);
 			}}
 			style={{ flex: 1 }}
-			onShouldStartLoadWithRequest={({ url }) => {
-				if (!hasAuthenticated && url.includes("ticket=")) {
-					// Prevent multiple firings
-					hasAuthenticated = true;
-					try {
-						// TODO: this is fragile and would break if there were other URL parameters. Create better solution?
-						let ticket = url.split("ticket=")[1];
-						console.log("DOING AUTH" + ticket);
-						authorize(ticket).then((authorization) => {
-							console.log(authorization.data);
-							let { token } = authorization.data;
-							login(token);
-							console.log("Just did login!");
-							setCurrentUrl("https://yalies.io/");
-						});
-					} catch (e) {
-						alert("Sorry, CAS rejected your login. Please try again later.");
-					}
-					return false;
-				}
-				return true;
-			}}
+			// onShouldStartLoadWithRequest={({ url }) => {
+			// 	if (!hasAuthenticated && url.includes("ticket=")) {
+			// 		// Prevent multiple firings
+			// 		hasAuthenticated = true;
+			// 		try {
+			// 			// TODO: this is fragile and would break if there were other URL parameters. Create better solution?
+			// 			let ticket = url.split("ticket=")[1];
+			// 			console.log("DOING AUTH" + ticket);
+			// 			authorize(ticket).then((authorization) => {
+			// 				console.log(authorization.data);
+			// 				let { token } = authorization.data;
+			// 				login(token);
+			// 				console.log("Just did login!");
+			// 				setCurrentUrl("https://yalies.io/");
+			// 			});
+			// 		} catch (e) {
+			// 			alert("Sorry, CAS rejected your login. Please try again later.");
+			// 		}
+			// 		return false;
+			// 	}
+			// 	return true;
+			// }}
 		/>
 	);
 };
