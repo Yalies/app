@@ -12,6 +12,13 @@ import { useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Sentry from "sentry-expo";
+
+Sentry.init({
+	dsn: "https://687e2d35e9a265e7706efad2e0ae2f71@o337120.ingest.sentry.io/4505921975222272",
+	enableInExpoDevelopment: true,
+	debug: false, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+});
 
 type Tab = {
 	url: string;
@@ -145,6 +152,16 @@ const WebViewScreen = ({ url }: { url: string }) => {
 		setCurrentUrl(url);
 	}, [url]);
 
+	const injectInitialCSS = `
+    const style = document.createElement('style');
+    style.innerHTML = \`
+        .banner, nav {
+            display: none !important;
+        }
+    \`;
+    document.head.appendChild(style);
+	`;
+
 	const hideElementsScript = `
         window.ReactNativeWebView.postMessage(document.cookie);
 
@@ -170,6 +187,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 	return (
 		<WebView
 			ref={webViewRef}
+			injectedJavaScript={injectInitialCSS}
 			onLoadEnd={handleLoadEnd}
 			source={{
 				uri: currentUrl,
@@ -177,6 +195,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 			onError={(syntheticEvent) => {
 				const { nativeEvent } = syntheticEvent;
 				console.warn("WebView error: ", nativeEvent);
+				Sentry.Native.captureException(nativeEvent);
 			}}
 			userAgent="Yalies Mobile App"
 			onLoad={() => console.log("WebView loaded!")}
@@ -190,6 +209,7 @@ const WebViewScreen = ({ url }: { url: string }) => {
 					"WebView received error status code: ",
 					nativeEvent.statusCode
 				);
+				Sentry.Native.captureException(nativeEvent.statusCode);
 			}}
 			style={{ flex: 1 }}
 		/>
