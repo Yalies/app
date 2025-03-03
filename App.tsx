@@ -32,6 +32,7 @@ const Colors = { darker: "#00356b", lighter: "#fff" };
 const LandingScreen = ({ onLoginPress }: { onLoginPress: any }) => {
 	// Check if the user is already logged in when the component mounts
 	useEffect(() => {
+		``;
 		const checkLoginStatus = async () => {
 			const isLogged = await AsyncStorage.getItem("isLogged");
 			if (isLogged === "true") {
