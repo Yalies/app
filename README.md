@@ -101,3 +101,7 @@ json
 ## License
 
 [Add your license information here]
+## Yalies App (Live on iOS)
+
+https://apps.apple.com/us/app/yalies/id6461600780 
+
