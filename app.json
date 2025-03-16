@@ -1,76 +1,87 @@
 {
-	"expo": {
-		"name": "yalies-app-expo",
-		"slug": "yalies-app-expo",
-		"version": "1.3.0",
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"userInterfaceStyle": "light",
-		"splash": {
-			"image": "./assets/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
-		},
-		"assetBundlePatterns": ["**/*"],
-		"hooks": {
-			"postPublish": [
-				{
-					"file": "sentry-expo/upload-sourcemaps",
-					"config": {
-						"organization": "goldinweb",
-						"project": "yalies-app",
-						"authToken": "919965e58a447a66b65f1f6a3bf07e94195266eb78c580e0546bdc57d6145698"
-					}
-				}
-			]
-		},
-		"ios": {
-			"supportsTablet": true,
-			"infoPlist": {
-				"CFBundleDevelopmentRegion": "en",
-				"CFBundleDisplayName": "yalies",
-				"UIViewControllerBasedStatusBarAppearance": false,
-				"NSAppTransportSecurity": {
-					"NSAllowsArbitraryLoads": true,
-					"NSExceptionDomains": {
-						"localhost": {
-							"NSExceptionAllowsInsecureHTTPLoads": true
-						},
-						"secure.its.yale.edu": {
-							"NSIncludesSubdomains": true,
-							"NSExceptionAllowsInsecureHTTPLoads": true,
-							"NSExceptionRequiresForwardSecrecy": false
-						},
-						"yalies.io": {
-							"NSIncludesSubdomains": true,
-							"NSExceptionAllowsInsecureHTTPLoads": true
-						}
-					}
-				},
-				"UIAppFonts": [
-					"fonts/FontAwesome.ttf",
-					"fonts/Ionicons.ttf",
-					"fonts/Foundation.ttf",
-					"fonts/MaterialCommunityIcons.ttf",
-					"fonts/MaterialIcons.ttf"
-				]
-			},
-			"bundleIdentifier": "com.goldin.yalies"
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#ffffff"
-			}
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		},
-		"extra": {
-			"eas": {
-				"projectId": "add21321-9e0c-4a76-8211-afc0b9aabfe5"
-			}
-		},
-		"plugins": ["sentry-expo"]
-	}
+  "expo": {
+    "name": "yalies-app-expo",
+    "slug": "yalies-app-expo",
+    "version": "1.3.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "goldinweb",
+            "project": "yalies-app",
+            "authToken": "919965e58a447a66b65f1f6a3bf07e94195266eb78c580e0546bdc57d6145698"
+          }
+        }
+      ]
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleDisplayName": "yalies",
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            },
+            "secure.its.yale.edu": {
+              "NSIncludesSubdomains": true,
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSExceptionRequiresForwardSecrecy": false
+            },
+            "yalies.io": {
+              "NSIncludesSubdomains": true,
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        },
+        "UIAppFonts": [
+          "fonts/FontAwesome.ttf",
+          "fonts/Ionicons.ttf",
+          "fonts/Foundation.ttf",
+          "fonts/MaterialCommunityIcons.ttf",
+          "fonts/MaterialIcons.ttf",
+          "fonts/FontAwesome.ttf",
+          "fonts/Ionicons.ttf",
+          "fonts/Foundation.ttf",
+          "fonts/MaterialCommunityIcons.ttf",
+          "fonts/MaterialIcons.ttf"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.goldin.yalies"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "add21321-9e0c-4a76-8211-afc0b9aabfe5"
+      }
+    },
+    "plugins": [
+      "sentry-expo"
+    ],
+    "owner": "yalies"
+  }
 }
